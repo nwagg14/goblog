@@ -1,0 +1,26 @@
+<!doctype html>
+<html ng-app="post" ng-controller="PostCtrl">
+<head>
+<script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.3/angular.min.js"></script>
+<script src="/files/js/lib/markdown.js"></script>
+</head>
+<body>
+	<form ng-submit="submit()">
+		Name: <input type="text" ng-model="post.author"><br>
+		Title: <input type="text" ng-model="post.title"><br>
+		Content: <textarea ng-model="post.content"></textarea><br>
+		<input type="submit" value="Submit">
+	</form>  
+</body>
+<script>
+  angular.module('post', [])
+    .controller('PostCtrl', ['$scope', '$http', function($scope, $http) {
+      $scope.post = {id: 0} 
+      $scope.submit = function() {
+        var d = new Date()
+        $scope.post.date = d.toISOString()
+        $http.post("/newPost", $scope.post)
+      };
+    }]);
+</script>
+</html>
