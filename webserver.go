@@ -49,5 +49,5 @@ func main() {
     http.HandleFunc("/newPost", newPost)
     http.HandleFunc("/files/", getFile)
     http.HandleFunc("/getPost/", getPostJson)
-    http.ListenAndServe(":8000", nil)
+    http.ListenAndServe(":80", nil)
 }

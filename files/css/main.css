@@ -1,0 +1,42 @@
+body {
+    background-color: black;
+    color:#00cc00;
+    font-family:"Lucida Console", Monaco, monospace;
+}
+
+code {
+    display:block;
+    color:white;
+    margin: auto;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    width: 75%;
+    border: 1px solid white;
+    padding: 10px;
+}
+
+article {
+    margin: auto;
+    margin-bottom:1cm;
+    width: 66%;
+    border: 1px solid #00dd00;
+    padding: 10px;
+}
+
+input {
+       display:block;
+       border: 1px solid #00dd00; 
+       background-color: black;
+       color:#00cc00;
+       font-family:"Lucida Console", Monaco, monospace;
+       margin-bottom: 1%;
+} 
+
+textarea {
+       display:block;
+       border: 1px solid #00dd00; 
+       background-color: black;
+       color:#00cc00;
+       font-family:"Lucida Console", Monaco, monospace;
+       margin-bottom: 1%;
+}
