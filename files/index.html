@@ -7,7 +7,7 @@
 </head>
 <body>
 <article ng-repeat="post in posts">
-<h1>{{post.title}}</h1>
+<h1><a href="/post/{{post.id}}">{{post.title}}</a></h1>
 <h3>{{post.author}} {{post.date | date : 'mediumDate'}}</h3>
 <p ng-bind-html="post.content | markdown">
 </p>
@@ -16,15 +16,18 @@
 <script>
   angular.module('index', [])
     .controller('IndexCtrl', ['$scope', '$http', function($scope, $http) {
-        $http.get("/top")
+        $http.get("/data/top")
           .then(function(response) {
             $scope.posts = response.data
           })
     }])
     .filter('markdown', ['$sce', function($sce) {
       return function(input) {
-        var output = $sce.trustAsHtml(markdown.toHTML(input));
-        return output;
+        if(input != undefined) {
+        	var output = $sce.trustAsHtml(markdown.toHTML(input));
+        	return output;
+	}
+	return "";
       }
     }]);
 </script>

@@ -8,19 +8,26 @@ import(
     "net/http"
 )
 
-func getHomepage(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "files/index.html")
+func log(url string) {
+    fmt.Println(time.Now().String() + " " + url)
 }
 
-func getWellKnown(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "files" + r.URL.Path)
+func getHomepage(w http.ResponseWriter, r *http.Request) {
+    log(r.URL.Path[1:])
+    http.ServeFile(w, r, "files/index.html")
+}
+
+func getPostHtml(w http.ResponseWriter, r *http.Request) {
+    log(r.URL.Path[1:])
+    http.ServeFile(w, r, "files/post.html")
 }
 
 func getFile(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, r.URL.Path[1:])
-        fmt.Println(time.Now().String() + " " + r.URL.Path[1:])
+    log(r.URL.Path[1:])
+    http.ServeFile(w, r, r.URL.Path[1:])
 }
-func getTop10(w http.ResponseWriter, r *http.Request) {
+func getTopJson(w http.ResponseWriter, r *http.Request) {
+    log(r.URL.Path[1:])
     p := getTop10Posts()
     encoder := json.NewEncoder(w)
     err := encoder.Encode(&p)
@@ -28,8 +35,10 @@ func getTop10(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPostJson(w http.ResponseWriter, r *http.Request) {
-    id, err_conv := strconv.Atoi(r.URL.Path[9:])
+    log(r.URL.Path[1:])
+    id, err_conv := strconv.Atoi(r.URL.Path[len("/data/post/"):])
     checkErr(err_conv)
+    fmt.Println(id)
     p := getPost(id)
 
     encoder := json.NewEncoder(w)
@@ -38,14 +47,25 @@ func getPostJson(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func newPost(w http.ResponseWriter, r *http.Request) {
-    var p Post
+func submitPost(w http.ResponseWriter, r *http.Request) {
+    log(r.URL.Path[1:])
+    var s Submission
     decoder := json.NewDecoder(r.Body)
-    err := decoder.Decode(&p)
-    checkErr(err) 
+    err := decoder.Decode(&s)
+    checkErr(err)
 
-    insertPost(p)    
-    fmt.Println(p)
+    if(s.Password == "") {
+        insertPost(s.Form)
+        fmt.Println(s.Form)
+        fmt.Fprintf(w, "true")
+    } else {
+        fmt.Fprintf(w, "false")
+    }
+}
+
+func getWellKnown(w http.ResponseWriter, r *http.Request) {
+    log(r.URL.Path[1:])
+    http.ServeFile(w, r, "files" + r.URL.Path)
 }
 
 func redirect(w http.ResponseWriter, r *http.Request) {
@@ -53,12 +73,16 @@ func redirect(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-    http.HandleFunc("/", getHomepage)
     http.HandleFunc("/.well-known/", getWellKnown)
-    http.HandleFunc("/top", getTop10)
-    http.HandleFunc("/newPost", newPost)
+
+    http.HandleFunc("/", getHomepage)
+    http.HandleFunc("/top", getHomepage)
+    http.HandleFunc("/post/", getPostHtml)
     http.HandleFunc("/files/", getFile)
-    http.HandleFunc("/getPost/", getPostJson)
+
+    http.HandleFunc("/data/top", getTopJson)
+    http.HandleFunc("/data/post/", getPostJson)
+    http.HandleFunc("/data/submit", submitPost)
 
     go func() {
         fmt.Println("Starting TLS Listner")

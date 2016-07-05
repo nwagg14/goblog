@@ -1,0 +1,64 @@
+<!doctype html>
+<html ng-app="post" ng-controller="PostCtrl">
+<head>
+<script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.3/angular.min.js"></script>
+<script src="/files/js/lib/markdown.js"></script>
+<link rel="stylesheet" type="text/css" href="/files/css/main.css" media="screen" />
+</head>
+<body>
+	<form ng-submit="submit()">
+                <div class='item'>
+			<label>Name</label>
+			<input type="text" ng-model="form.post.author">
+		</div>
+                <div class='item'>
+			<label>Title</label>
+			<input type="text" ng-model="form.post.title">
+		</div>
+                <div class='item'>
+			<label>Content</label><br>
+			<textarea ng-model="form.post.content" rows="10" cols="50"></textarea>
+		</div>
+                
+		<div class='item'>
+			<label>Password</label>
+			<input type="password" ng-model="form.pass">
+		</div>
+		<input type="submit" value="Submit">
+	</form>  
+	<article>
+		<h1>{{form.post.title}}</h1>
+		<h3>{{form.post.author}} {{form.post.date | date : 'mediumDate'}}</h3>
+		<p ng-bind-html="form.post.content | markdown">
+		</p>
+	</article>
+</body>
+<script>
+  angular.module('post', [])
+    .controller('PostCtrl', ['$scope', '$http', function($scope, $http) {
+      $scope.form = { post:{},  pass: ""} 
+      $scope.form.post.date = new Date()
+      $scope.submit = function() {
+        var d = new Date()
+        $scope.form.post.date = d.toISOString()
+        $http.post("/data/submit", $scope.form).success(function(success) {
+		if (success == "true") {
+        		$scope.form = {}
+		} else {
+			alert("Error posting!")
+			delete $scope.form.pass;
+		}
+        });
+      }
+    }])
+    .filter('markdown', ['$sce', function($sce) {
+      return function(input) {
+        if(input != undefined) {
+        	var output = $sce.trustAsHtml(markdown.toHTML(input));
+        	return output;
+	}
+	return "";
+      }
+    }]);
+</script>
+</html>

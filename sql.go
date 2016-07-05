@@ -50,6 +50,7 @@ func getNextPostId(db *sql.DB) (id int) {
 }
 
 func getPost(id int) (post Post){
+    fmt.Println("getPost:", id)
     db, err := sql.Open("sqlite3", "./blog.db")
     checkErr(err)
 
@@ -65,7 +66,7 @@ func getPost(id int) (post Post){
         err = rows.Scan(&post.Id, &post.Title, &post.Author, &timeStr, &post.Content)
         checkErr(err)
 
-        form := "2006-01-02 03:04:05-07:00"
+        form := "2006-01-02 15:04:05-07:00"
 	t, err2 := time.Parse(form, timeStr)
         checkErr(err2)
         post.Date = t
@@ -112,7 +113,6 @@ func insertPost(post Post) {
     checkErr(err_posts)
     nextPostId := getNextPostId(db) 
     fmt.Println(nextPostId)
-    fmt.Println(post)
     _, err_exec1 := stmt_posts.Exec(nextPostId, post.Title, post.Content, post.Date, post.Author)
     checkErr(err_exec1)
     db.Close()

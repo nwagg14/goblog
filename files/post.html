@@ -6,32 +6,42 @@
 <link rel="stylesheet" type="text/css" href="/files/css/main.css" media="screen" />
 </head>
 <body>
-	<form ng-submit="submit()">
-                <div class='item'>
-			<label>Name</label>
-			<input type="text" ng-model="post.author">
-		</div>
-                <div class='item'>
-			<label>Title</label>
-			<input type="text" ng-model="post.title">
-		</div>
-                <div class='item'>
-			<label>Content</label><br>
-			<textarea ng-model="post.content" rows="10" cols="50"></textarea>
-		</div>
-		<input type="submit" value="Submit">
-	</form>  
+<article>
+<h1>{{post.title}}</h1>
+<h3>{{post.author}} {{post.date | date : 'mediumDate'}}</h3>
+<p ng-bind-html="post.content | markdown">
+</p>
+</article>
+<navbar>
+<ul>
+<li ng-repeat="p in recentPosts">
+	<a href="/post/{{p.id}}">{{p.title}}</a>
+</li>
+</ul>
+</navbar>
 </body>
 <script>
   angular.module('post', [])
-    .controller('PostCtrl', ['$scope', '$http', function($scope, $http) {
-      $scope.post = {id: 0} 
-      $scope.submit = function() {
-        var d = new Date()
-        $scope.post.date = d.toISOString()
-        $http.post("/newPost", $scope.post)
-        $scope.post = {}
-      };
+    .controller('PostCtrl', ['$scope', '$location', '$http', function($scope, $routeParams, $http) {
+        var path = $routeParams.absUrl()
+        var splitPath = path.split('/')
+        $http.get("/data/post/" + splitPath[splitPath.length - 1])
+          .then(function(response) {
+            $scope.post = response.data
+          })
+        $http.get("/data/top")
+          .then(function(response) {
+            $scope.recentPosts = response.data
+          })
+    }])
+    .filter('markdown', ['$sce', function($sce) {
+      return function(input) {
+        if(input != undefined) {
+        	var output = $sce.trustAsHtml(markdown.toHTML(input));
+        	return output;
+	}
+	return "";
+      }
     }]);
 </script>
 </html>

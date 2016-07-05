@@ -9,6 +9,11 @@ type Blog struct {
     About string `json:"about"`
 }
 
+type Submission struct {
+    Form Post `json:"post"`
+    Password string `json:"pass"`
+}
+
 type Post struct {
     Id    int    `json:"id"`
     Title string `json:"title"`
